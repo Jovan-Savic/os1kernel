@@ -5,12 +5,12 @@
 #ifndef PROJEKAT_WORKERS_HPP
 #define PROJEKAT_WORKERS_HPP
 
-extern void workerBodyA();
+extern void workerBodyA(void* g);
 
-extern void workerBodyB();
+extern void workerBodyB(void* g);
 
-extern void workerBodyC();
+extern void workerBodyC(void* g);
 
-extern void workerBodyD();
+extern void workerBodyD(void* g);
 
 #endif //PROJEKAT_WORKERS_HPP

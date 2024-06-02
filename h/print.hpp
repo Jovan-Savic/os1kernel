@@ -8,6 +8,7 @@
 #include "../lib/hw.h"
 #include "../lib/console.h"
 #include "riscv.hpp"
+
 extern void printString(char const* string);
 extern void printInteger(uint64 integer);
 

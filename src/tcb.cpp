@@ -43,8 +43,8 @@ void TCB::dispatch(){
     TCB::contextSwitch(&old->context, &running->context);
 }
 
-TCB *TCB::createThread(Body body) {
-    return new TCB(body,TIME_SLICE);
+TCB *TCB::createThread(Body body, void * argument) {
+    return new TCB(body,TIME_SLICE, argument);
 }
 
 void TCB::deleteThread(TCB* thread){
@@ -52,9 +52,9 @@ void TCB::deleteThread(TCB* thread){
 }
 
 
-int TCB::exitThread() {
+int TCB::exitThread(){
     TCB::running->setFinished(true);
-    TCB::yield();
+    TCB::dispatch();
     return 0;
 }
 
@@ -62,7 +62,7 @@ int TCB::exitThread() {
 void TCB::threadWrapper() {
 
     Riscv::popSppSpie();
-    running->body();
+    running->body(running->argument);
     running->setFinished(true);
     TCB::yield();
 }

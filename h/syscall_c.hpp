@@ -6,15 +6,16 @@
 #define PROJEKAT_SYSCALL_C_HPP
 
 #include "../lib/hw.h"
+#include "tcb.hpp"
 
-    void* mem_alloc (size_t size);
+void* mem_alloc (size_t size);
     int mem_free (void* p);
 
-    class _thread;
-    typedef _thread* thread_t;
+    //class _thread;
+    //typedef _thread* thread_t;
 
     int thread_create (
-            thread_t* handle,
+            TCB* handle,
             void(*start_routine)(void*),
             void* arg
     );

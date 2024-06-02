@@ -7,6 +7,7 @@
 #include "../lib/hw.h"
 #include "scheduler.hpp"
 #include "riscv.hpp"
+
 class TCB {
 
     void *operator new(size_t n);
@@ -20,19 +21,20 @@ class TCB {
 public:
     ~TCB(){TCB::operator delete[](stack);}
     bool isFinished() const {return finished;}
-    void setFinished(bool finished) { TCB::finished = finished;}
+    void setFinished(bool f) { TCB::finished = f;}
+
     uint64 getTimeSlice() const { return timeSlice; }
 
     static TCB* running;
-    using Body = void(*)();
+    using Body = void(*)(void*);
 
-    static TCB *createThread(Body body);
+    static TCB *createThread(Body body, void *arg);
     static void deleteThread(TCB *thread);
     static int exitThread();
     static void yield();
 
 private:
-    explicit TCB(Body body, uint64 timeSlice): body(body), stack(body != nullptr ? (uint64*)TCB::operator new[](STACK_SIZE) : nullptr),
+    explicit TCB(Body body, uint64 timeSlice, void* arg): body(body), argument(arg), stack(body != nullptr ? (uint64*)TCB::operator new[](STACK_SIZE) : nullptr),
     context({
             (uint64) &threadWrapper,
             stack != nullptr ? (uint64) &stack[STACK_SIZE] : 0
@@ -48,6 +50,7 @@ private:
         uint64 sp;
     };
     Body body;
+    void* argument;
     uint64 *stack;
     Context context;
     uint64 timeSlice;
