@@ -15,11 +15,8 @@ void Riscv::handleSupervisorTrap() {
 
     uint64 ra = r_a0();
     uint64 scause = r_scause();
-    uint64 a3;
-    __asm__ volatile("mv %0, a3":"=r"(a3));
-    if(scause == 0x0000000000000008UL || scause == 0x0000000000000009UL){//pomera registar a3???
 
-        __asm__ volatile("mv a3, %0"::"r"(a3));
+    if(scause == 0x0000000000000008UL || scause == 0x0000000000000009UL){//pomera registar a3??
         //environment call
         uint64 volatile sepc = r_sepc() +4;
         uint64 volatile sstatus = r_sstatus();
@@ -31,7 +28,7 @@ void Riscv::handleSupervisorTrap() {
                 __asm__ volatile("mv %0, a1":"=r"(size));
                 mallocr = MemoryAllocator::mem_alloc(size);
                 __asm__ volatile("mv t0, %0"::"r"(mallocr));
-                __asm__ volatile("sw t0, 80(x8)");
+                __asm__ volatile("sd t0, 80(x8)");
                 break;
 
             case 0x02:
@@ -40,23 +37,22 @@ void Riscv::handleSupervisorTrap() {
                 __asm__ volatile("mv %0, a1":"=r"(freep));
                 greska = MemoryAllocator::mem_free(freep);
                 __asm__ volatile("mv t0, %0" ::"r"(greska));
-                __asm__ volatile("sw t0, 80(x8)");
+                __asm__ volatile("sd t0, 80(x8)");
                 break;
 
             case 0x11:
-                TCB::Body fun;
+                TCB::Body start_routine;
                 void* arg;
-                TCB* handle;
-                __asm__ volatile("mv %0, a1":"=r"(handle));
-                __asm__ volatile("mv %0, a2":"=r"(fun));
-                __asm__ volatile("mv %0, a3":"=r"(arg));
-                handle = TCB::createThread(fun,arg);
-                if(handle != nullptr) ret =0;
+                thread_t* handle;
+                __asm__ volatile("ld %0, 88(x8)": "=r"(handle));
+                __asm__ volatile("ld %0, 96(x8)": "=r"(start_routine));
+                __asm__ volatile("ld %0, 104(x8)": "=r"(arg));
+                *handle = TCB::createThread(start_routine,arg);
+                if(*handle != nullptr) ret =0;
                 else ret = -1;
-                __asm__ volatile("mv a2, %0"::"r"(handle));
 
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
-                __asm__ volatile("sw t0, 80(x8)");
+                __asm__ volatile("sd t0, 80(x8)");
                 break;
 
             case 0x12:

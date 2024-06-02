@@ -39,20 +39,20 @@ int main()
 
 
     //threads[0] = TCB::createThread(nullptr, nullptr);
-    thread_create(threads[0],nullptr, nullptr);
+    thread_create(&threads[0],nullptr, nullptr);
     TCB::running = threads[0];
 
     //threads[1] = TCB::createThread(workerBodyA, nullptr);
-    thread_create(threads[1],workerBodyA, nullptr);
+    thread_create(&threads[1],workerBodyA, nullptr);
     printString("ThreadA created\n");
     //threads[2] = TCB::createThread(workerBodyB , nullptr);
-    thread_create(threads[2],workerBodyB, nullptr);
+    thread_create(&threads[2],workerBodyB, nullptr);
     printString("ThreadB created\n");
     //threads[3] = TCB::createThread(workerBodyC, nullptr);
-    thread_create(threads[3],workerBodyC, nullptr);
+    thread_create(&threads[3],workerBodyC, nullptr);
     printString("ThreadC created\n");
     //threads[4] = TCB::createThread(workerBodyD, nullptr);
-    thread_create(threads[4],workerBodyD, nullptr);
+    thread_create(&threads[4],workerBodyD, nullptr);
     printString("ThreadD created\n");
 
 

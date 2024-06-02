@@ -42,7 +42,7 @@ int thread_exit() {
     return (int)r;
 }
 
-int thread_create(TCB *handle, void (*start_routine)(void *), void *arg) {
+int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
 
     __asm__ volatile("mv a3, %0" :: "r"(arg));
     __asm__ volatile("mv a2, %0" :: "r"(start_routine));
@@ -51,6 +51,5 @@ int thread_create(TCB *handle, void (*start_routine)(void *), void *arg) {
     __asm__ volatile("ecall");
     uint64 r;//
     __asm__ volatile("mv %0, a0": "=r"(r));
-    __asm__ volatile("mv %0, a2":"=r"(handle));
     return (int)r;
 }
