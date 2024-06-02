@@ -44,6 +44,9 @@ int thread_exit() {
 
 int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
 
+    void* stek;
+    stek = start_routine != nullptr ? mem_alloc(DEFAULT_STACK_SIZE) : nullptr;
+    __asm__ volatile("mv a4, %0" :: "r"(stek));
     __asm__ volatile("mv a3, %0" :: "r"(arg));
     __asm__ volatile("mv a2, %0" :: "r"(start_routine));
     __asm__ volatile("mv a1, %0" :: "r"(handle));

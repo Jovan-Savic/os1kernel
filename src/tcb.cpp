@@ -43,8 +43,8 @@ void TCB::dispatch(){
     TCB::contextSwitch(&old->context, &running->context);
 }
 
-TCB *TCB::createThread(Body body, void * argument) {
-    return new TCB(body,TIME_SLICE, argument);
+TCB *TCB::createThread(Body body, void * argument, void*stek) {
+    return new TCB(body,DEFAULT_TIME_SLICE, argument, stek);
 }
 
 void TCB::deleteThread(TCB* thread){

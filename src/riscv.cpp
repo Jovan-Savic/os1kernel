@@ -44,10 +44,12 @@ void Riscv::handleSupervisorTrap() {
                 TCB::Body start_routine;
                 void* arg;
                 thread_t* handle;
+                void* stek;
                 __asm__ volatile("ld %0, 88(x8)": "=r"(handle));
                 __asm__ volatile("ld %0, 96(x8)": "=r"(start_routine));
                 __asm__ volatile("ld %0, 104(x8)": "=r"(arg));
-                *handle = TCB::createThread(start_routine,arg);
+                __asm__ volatile("ld %0, 112(x8)": "=r"(stek));
+                *handle = TCB::createThread(start_routine,arg, stek);
                 if(*handle != nullptr) ret =0;
                 else ret = -1;
 

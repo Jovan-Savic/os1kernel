@@ -28,16 +28,16 @@ public:
     static TCB* running;
     using Body = void(*)(void*);
 
-    static TCB *createThread(Body body, void *arg);
+    static TCB *createThread(Body body, void *arg, void*stek);
     static void deleteThread(TCB *thread);
     static int exitThread();
     static void yield();
 
 private:
-    explicit TCB(Body body, uint64 timeSlice, void* arg): body(body), argument(arg), stack(body != nullptr ? (uint64*)TCB::operator new[](STACK_SIZE) : nullptr),
+    explicit TCB(Body body, uint64 timeSlice, void* arg, void* stek): body(body), argument(arg), stack((uint64*)stek),
     context({
             (uint64) &threadWrapper,
-            stack != nullptr ? (uint64) &stack[STACK_SIZE] : 0
+            stack != nullptr ? (uint64) &stack[DEFAULT_STACK_SIZE] : 0
                 }),
                 timeSlice(timeSlice),
                 finished(false)
@@ -56,9 +56,6 @@ private:
     uint64 timeSlice;
     bool finished;
     static uint64 timeSliceCounter;
-
-    static uint64 constexpr STACK_SIZE = 1024;
-    static uint64 constexpr TIME_SLICE = 2;
 
     friend class Riscv;
     static void threadWrapper();
