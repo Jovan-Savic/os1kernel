@@ -1,0 +1,43 @@
+//
+// Created by os on 5/18/24.
+//
+
+#include "../h/syscall_c.hpp"
+
+void* mem_alloc (size_t size){
+    size_t real;
+    if(size % MEM_BLOCK_SIZE == 0)  real = size;
+    else {
+        size_t rem = size % MEM_BLOCK_SIZE;
+        real = size - rem + MEM_BLOCK_SIZE;
+    }
+
+    __asm__ volatile("mv a1, %0" :: "r"(real));
+    __asm__ volatile("li a0, 0x01");
+    __asm__ volatile("ecall");
+    void* r;
+    __asm__ volatile("mv %0,a0":"=r"(r));
+    return  r;
+}
+int mem_free (void* p){
+    __asm__ volatile("mv a1, %0":: "r"(p));
+    __asm__ volatile("li a0, 0x02");
+    __asm__ volatile("ecall");
+
+    uint64 r;//
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return (int)r;
+}
+
+void thread_dispatch() {
+    __asm__ volatile("li a0, 0x13");
+    __asm__ volatile("ecall");
+}
+
+int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
+
+
+
+
+    return 0;
+}

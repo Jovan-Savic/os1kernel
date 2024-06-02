@@ -1,0 +1,75 @@
+//
+// Created by os on 5/17/24.
+//
+
+#include "../h/riscv.hpp"
+
+
+void Riscv::popSppSpie() {
+    __asm__ volatile("csrw sepc, ra");
+    __asm__ volatile("sret");
+}
+
+void Riscv::handleSupervisorTrap() {
+
+    uint64 ra = r_a0();
+    uint64 scause = r_scause();
+    if(scause == 0x0000000000000008UL || scause == 0x0000000000000009UL){
+        //environment call
+        uint64 volatile sepc = r_sepc() +4;
+        uint64 volatile sstatus = r_sstatus();
+
+        switch (ra) {
+            case 0x01:
+                size_t size;
+                void *mallocr;
+                __asm__ volatile("mv %0, a1":"=r"(size));
+                mallocr = MemoryAllocator::mem_alloc(size);
+                __asm__ volatile("mv t0, %0"::"r"(mallocr));
+                __asm__ volatile("sw t0, 80(x8)");
+                break;
+            case 0x02:
+                void *freep;
+                int greska;
+                __asm__ volatile("mv %0, a1":"=r"(freep));
+                greska = MemoryAllocator::mem_free(freep);
+                __asm__ volatile("mv t0, %0" ::"r"(greska));
+                __asm__ volatile("sw t0, 80(x8)");
+                break;
+            case 0x13:
+                TCB::timeSliceCounter=0;
+                TCB::dispatch();
+                break;
+            default:
+                break;
+        }
+
+        w_sstatus(sstatus);
+        w_sepc(sepc);
+    }
+    else if(scause == 0x8000000000000001UL){
+        mc_sip(SIP_SSIP);
+        TCB::timeSliceCounter++;
+        //supervisor software interrupt; timer
+        if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
+
+            uint64 volatile sepc = r_sepc();
+            uint64 volatile sstatus = r_sstatus();
+            TCB::timeSliceCounter=0;
+            TCB::dispatch();
+            w_sstatus(sstatus);
+            w_sepc(sepc);
+        }
+
+
+    }else if(scause == 0x8000000000000009UL){
+        // supervisor external interrupt; console
+
+        console_handler();
+    }else{
+        //unexpected interrupt;
+        printInteger(scause);
+        printInteger(r_sepc());
+        printInteger(r_stval());
+    }
+};
