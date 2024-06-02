@@ -32,6 +32,7 @@ public:
     static void deleteThread(TCB *thread);
     static int exitThread();
     static void yield();
+    void setBlocked(bool b);
 
 private:
     explicit TCB(Body body, uint64 timeSlice, void* arg, void* stek): body(body), argument(arg), stack((uint64*)stek),
@@ -40,7 +41,8 @@ private:
             stack != nullptr ? (uint64) &stack[DEFAULT_STACK_SIZE] : 0
                 }),
                 timeSlice(timeSlice),
-                finished(false)
+                finished(false),
+                blocked(false)
     {
         if(body!= nullptr) Scheduler::put(this);
     };
@@ -55,12 +57,15 @@ private:
     Context context;
     uint64 timeSlice;
     bool finished;
-    static uint64 timeSliceCounter;
+    bool blocked;
 
+    static uint64 timeSliceCounter;
     friend class Riscv;
+    friend class Semaphore;
     static void threadWrapper();
     static void dispatch();
     static void contextSwitch(Context* old, Context* running);
+
 
 
 };

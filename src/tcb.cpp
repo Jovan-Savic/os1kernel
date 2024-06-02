@@ -36,7 +36,7 @@ void TCB::yield(){
 void TCB::dispatch(){
 
     TCB* old= running;
-    if(!old->isFinished()){
+    if(!old->isFinished() && !old->blocked){
         Scheduler::put(old);
     }
     running = Scheduler::get();
@@ -65,5 +65,9 @@ void TCB::threadWrapper() {
     running->body(running->argument);
     running->setFinished(true);
     TCB::yield();
+}
+
+void TCB::setBlocked(bool b) {
+    this->blocked = b;
 }
 

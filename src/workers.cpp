@@ -5,9 +5,11 @@
 #include "../lib/hw.h"
 #include "../h/print.hpp"
 #include "../h/syscall_c.hpp"
+#include "../h/semaphore.hpp"
 
 void workerBodyA(void* g)
 {
+
     for (uint64 i = 0; i < 10; i++)
     {
         printString("A: i=");
