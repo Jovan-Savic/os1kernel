@@ -33,9 +33,7 @@ int sem::closeSemaphore() {
     else return -2;
 
    while(this->blocked.peekFirst()){
-       TCB* thread = this->blocked.removeFirst();
-       thread->setBlocked(false);
-       Scheduler::put(thread);
+       unblock();
    }
     return 0;
 }
@@ -44,11 +42,7 @@ int sem::wait() {
     if(this->closed) return -2;
     this->value--;
     if(this->value <0){
-        this->blocked.addLast(TCB::running);
-        TCB::running->setBlocked(true);
-
-        TCB::timeSliceCounter=0;
-        TCB::dispatch();
+        block();
     }
 
     return 0;
@@ -57,19 +51,38 @@ int sem::wait() {
 int sem::signal() {
     if(this->closed) return -2;
     this->value++;
-    if(this->value >0){
-        TCB* thread = this->blocked.removeFirst();
-        thread->setBlocked(false);
-        Scheduler::put(thread);
+    if(this->value <=0){
+       unblock();
     }
     return 0;
 }
 
 int sem::trywait() {
-    return 0;
+
+    if(this->closed) return -2;
+    this->value--;
+    if(this->value <0){
+        return 0;
+    }
+    return 1;
+
 }
 
 int sem::timed_wait() {
     return 0;
+}
+
+void sem::block() {
+    this->blocked.addLast(TCB::running);
+    TCB::running->setBlocked(true);
+
+    TCB::timeSliceCounter=0;
+    TCB::dispatch();
+}
+
+void sem::unblock() {
+    TCB* thread = this->blocked.removeFirst();
+    thread->setBlocked(false);
+    Scheduler::put(thread);
 }
 

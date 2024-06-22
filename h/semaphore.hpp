@@ -32,6 +32,10 @@ private:
     int value;
     bool closed;
     List<TCB> blocked;
+
+     void block();
+     void unblock();
+
 };
 
 
