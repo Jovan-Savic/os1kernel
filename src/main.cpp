@@ -40,6 +40,7 @@ int main()
 
     //threads[0] = TCB::createThread(nullptr, nullptr);
     thread_create(&threads[0],nullptr, nullptr);
+
     TCB::running = threads[0];
 
     //threads[1] = TCB::createThread(workerBodyA, nullptr);
