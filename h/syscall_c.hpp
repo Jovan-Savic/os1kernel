@@ -7,6 +7,7 @@
 
 #include "../lib/hw.h"
 #include "tcb.hpp"
+#include "semaphore.hpp"
 
 void* mem_alloc (size_t size);
     int mem_free (void* p);
@@ -24,8 +25,8 @@ void* mem_alloc (size_t size);
 
     int thread_exit ();
 
-    class _sem;
-    typedef _sem* sem_t;
+    class sem;
+    typedef sem* sem_t;
     int sem_open (
             sem_t* handle,
             unsigned init

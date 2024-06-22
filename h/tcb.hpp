@@ -61,7 +61,7 @@ private:
 
     static uint64 timeSliceCounter;
     friend class Riscv;
-    friend class Semaphore;
+    friend class sem;
     static void threadWrapper();
     static void dispatch();
     static void contextSwitch(Context* old, Context* running);

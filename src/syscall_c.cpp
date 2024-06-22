@@ -24,9 +24,9 @@ int mem_free (void* p){
     __asm__ volatile("li a0, 0x02");
     __asm__ volatile("ecall");
 
-    uint64 r;//
+    int r;
     __asm__ volatile("mv %0, a0": "=r"(r));
-    return (int)r;
+    return r;
 }
 
 void thread_dispatch() {
@@ -37,9 +37,9 @@ void thread_dispatch() {
 int thread_exit() {
     __asm__ volatile("li a0, 0x12");
     __asm__ volatile("ecall");
-    uint64 r;//
+    int r;
     __asm__ volatile("mv %0, a0": "=r"(r));
-    return (int)r;
+    return r;
 }
 
 int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
@@ -52,7 +52,49 @@ int thread_create(thread_t *handle, void (*start_routine)(void *), void *arg) {
     __asm__ volatile("mv a1, %0" :: "r"(handle));
     __asm__ volatile("li a0, 0x11");
     __asm__ volatile("ecall");
-    uint64 r;//
+    int r;
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return r;
+}
+
+int sem_open(sem_t *handle, unsigned int init) {
+    __asm__ volatile("mv a2, %0" :: "r"(init));
+    __asm__ volatile("mv a1, %0" :: "r"(handle));
+    __asm__ volatile("li a0, 0x21");
+    __asm__ volatile("ecall");
+
+    int r;
     __asm__ volatile("mv %0, a0": "=r"(r));
     return (int)r;
+}
+
+int sem_close(sem_t handle) {
+
+    __asm__ volatile("mv a1, %0" :: "r"(handle));
+    __asm__ volatile("li a0, 0x22");
+    __asm__ volatile("ecall");
+
+    int r;
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return r;
+}
+
+int sem_wait(sem_t id) {
+    __asm__ volatile("mv a1, %0" :: "r"(id));
+    __asm__ volatile("li a0, 0x23");
+    __asm__ volatile("ecall");
+
+    int r;
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return r;
+}
+
+int sem_signal(sem_t id) {
+    __asm__ volatile("mv a1, %0" :: "r"(id));
+    __asm__ volatile("li a0, 0x24");
+    __asm__ volatile("ecall");
+
+    int r;
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return r;
 }

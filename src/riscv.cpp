@@ -21,6 +21,7 @@ void Riscv::handleSupervisorTrap() {
         uint64 volatile sepc = r_sepc() +4;
         uint64 volatile sstatus = r_sstatus();
         int ret;
+        sem_t * shandle;
         switch (ra) {
             case 0x01:
                 size_t size;
@@ -43,14 +44,14 @@ void Riscv::handleSupervisorTrap() {
             case 0x11:
                 TCB::Body start_routine;
                 void* arg;
-                thread_t* handle;
+                thread_t* thandle;
                 void* stek;
-                __asm__ volatile("ld %0, 88(x8)": "=r"(handle));
+                __asm__ volatile("ld %0, 88(x8)": "=r"(thandle));
                 __asm__ volatile("ld %0, 96(x8)": "=r"(start_routine));
                 __asm__ volatile("ld %0, 104(x8)": "=r"(arg));
                 __asm__ volatile("ld %0, 112(x8)": "=r"(stek));
-                *handle = TCB::createThread(start_routine,arg, stek);
-                if(*handle != nullptr) ret =0;
+                *thandle = TCB::createThread(start_routine,arg, stek);
+                if(*thandle != nullptr) ret =0;
                 else ret = -1;
 
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
@@ -67,8 +68,39 @@ void Riscv::handleSupervisorTrap() {
                 TCB::timeSliceCounter=0;
                 TCB::dispatch();
                 break;
-            default:
+
+            case 0x21:
+                int val;
+                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
+                __asm__ volatile("ld %0, 96(x8)": "=r"(val));
+                *shandle = sem::openSemaphore(val);
+                if(*shandle != nullptr) ret =0;
+                else ret = -1;
+                __asm__ volatile("mv t0, %0" ::"r"(ret));
+                __asm__ volatile("sw t0, 80(x8)");
                 break;
+
+            case 0x22:
+                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
+                ret = (*shandle)->sem::closeSemaphore();
+                __asm__ volatile("mv t0, %0" ::"r"(ret));
+                __asm__ volatile("sw t0, 80(x8)");
+                break;
+            case 0x23:
+                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
+                ret = (*shandle)->sem::wait();
+                __asm__ volatile("mv t0, %0" ::"r"(ret));
+                __asm__ volatile("sw t0, 80(x8)");
+                break;
+            case 0x24:
+                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
+                ret = (*shandle)->sem::signal();
+                __asm__ volatile("mv t0, %0" ::"r"(ret));
+                __asm__ volatile("sw t0, 80(x8)");
+                break;
+            default:
+                    break;
+
         }
 
         w_sstatus(sstatus);
