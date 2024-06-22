@@ -22,6 +22,7 @@ void Riscv::handleSupervisorTrap() {
         uint64 volatile sstatus = r_sstatus();
         int ret;
         sem_t * shandle;
+        sem_t id;
         switch (ra) {
             case 0x01:
                 size_t size;
@@ -81,20 +82,20 @@ void Riscv::handleSupervisorTrap() {
                 break;
 
             case 0x22:
-                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
-                ret = (*shandle)->sem::closeSemaphore();
+                __asm__ volatile("ld %0, 88(x8)": "=r"(id));
+                ret = id->sem::closeSemaphore();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
             case 0x23:
-                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
-                ret = (*shandle)->sem::wait();
+                __asm__ volatile("ld %0, 88(x8)": "=r"(id));
+                ret = id->sem::wait();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
             case 0x24:
-                __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
-                ret = (*shandle)->sem::signal();
+                __asm__ volatile("ld %0, 88(x8)": "=r"(id));
+                ret = id->sem::signal();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
