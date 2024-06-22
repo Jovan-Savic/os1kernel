@@ -5,6 +5,8 @@
 #ifndef PROJEKAT_WORKERS_HPP
 #define PROJEKAT_WORKERS_HPP
 
+#include "semaphore.hpp"
+
 extern void workerBodyA(void* g);
 
 extern void workerBodyB(void* g);

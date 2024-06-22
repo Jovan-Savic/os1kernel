@@ -20,7 +20,6 @@ int main()
     if(niz == nullptr) {
         __putc('?');
     }
-
     int n = 10;
     char* niz2 = (char*)mem_alloc(n*sizeof(char));
     if(niz2 == nullptr) {
@@ -42,15 +41,18 @@ int main()
     thread_create(&threads[0],nullptr, nullptr);
 
     TCB::running = threads[0];
+    sem_t semafor;
+    sem_open(&semafor, 1);
+
 
     //threads[1] = TCB::createThread(workerBodyA, nullptr);
-    thread_create(&threads[1],workerBodyA, nullptr);
+    thread_create(&threads[1],workerBodyA, semafor);
     printString("ThreadA created\n");
     //threads[2] = TCB::createThread(workerBodyB , nullptr);
     thread_create(&threads[2],workerBodyB, nullptr);
     printString("ThreadB created\n");
     //threads[3] = TCB::createThread(workerBodyC, nullptr);
-    thread_create(&threads[3],workerBodyC, nullptr);
+    thread_create(&threads[3],workerBodyC, semafor);
     printString("ThreadC created\n");
     //threads[4] = TCB::createThread(workerBodyD, nullptr);
     thread_create(&threads[4],workerBodyD, nullptr);

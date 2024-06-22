@@ -9,7 +9,8 @@
 
 void workerBodyA(void* g)
 {
-
+    sem* s = (sem*) g;
+    sem_wait(s);
     for (uint64 i = 0; i < 10; i++)
     {
         printString("A: i=");
@@ -24,6 +25,8 @@ void workerBodyA(void* g)
 //            TCB::yield();
         }
     }
+    sem_close(s);
+    sem_signal(s);
 }
 
 void workerBodyB(void* g)
@@ -54,6 +57,8 @@ static uint64 fibonacci(uint64 n)
 
 void workerBodyC(void* g)
 {
+   sem* s = (sem*) g;
+    sem_wait(s);
     uint8 i = 0;
     for (; i < 3; i++)
     {
@@ -85,6 +90,7 @@ void workerBodyC(void* g)
         printString("\n");
     }
 //    TCB::yield();
+    sem_signal(s);
 }
 
 void workerBodyD(void* g)
