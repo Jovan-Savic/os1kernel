@@ -4,31 +4,31 @@
 
 #include "../h/semaphore.hpp"
 
-void *Semaphore::operator new(size_t n)
+void *sem::operator new(size_t n)
 {
     return MemoryAllocator::mem_alloc(n);
 }
 
-void *Semaphore::operator new[](size_t n)
+void *sem::operator new[](size_t n)
 {
     return MemoryAllocator::mem_alloc(n);
 }
 
-void Semaphore::operator delete(void *p) noexcept
+void sem::operator delete(void *p) noexcept
 {
     MemoryAllocator::mem_free(p);
 }
 
-void Semaphore::operator delete[](void *p) noexcept
+void sem::operator delete[](void *p) noexcept
 {
     MemoryAllocator::mem_free(p);
 }
 
-Semaphore *Semaphore::openSemaphore(int val) {
-    return new Semaphore(val);
+sem *sem::openSemaphore(int val) {
+    return new sem(val);
 }
 
-int Semaphore::closeSemaphore() {
+int sem::closeSemaphore() {
     if(!this->closed) this->closed = true;
     else return -2;
 
@@ -40,10 +40,10 @@ int Semaphore::closeSemaphore() {
     return 0;
 }
 
-int Semaphore::wait() {
+int sem::wait() {
     if(this->closed) return -2;
     this->value--;
-    if(this->value <=0){
+    if(this->value <0){
         this->blocked.addLast(TCB::running);
         TCB::running->setBlocked(true);
 
@@ -54,7 +54,7 @@ int Semaphore::wait() {
     return 0;
 }
 
-int Semaphore::signal() {
+int sem::signal() {
     if(this->closed) return -2;
     this->value++;
     if(this->value >0){
@@ -65,11 +65,11 @@ int Semaphore::signal() {
     return 0;
 }
 
-int Semaphore::trywait() {
+int sem::trywait() {
     return 0;
 }
 
-int Semaphore::timed_wait() {
+int sem::timed_wait() {
     return 0;
 }
 
