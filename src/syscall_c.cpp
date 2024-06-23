@@ -98,3 +98,14 @@ int sem_signal(sem_t id) {
     __asm__ volatile("mv %0, a0": "=r"(r));
     return r;
 }
+
+int sem_trywait(sem_t id) {
+
+    __asm__ volatile("mv a1, %0" :: "r"(id));
+    __asm__ volatile("li a0, 0x26");
+    __asm__ volatile("ecall");
+
+    int r;
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return r;
+}

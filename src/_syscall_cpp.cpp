@@ -10,13 +10,11 @@ using size_t = decltype(sizeof(0));
 //public thread
 
 Thread::Thread(void (*body)(void *), void *arg) {
-    myHandle = nullptr;
     thread_create(&myHandle, body, arg);
 }//prvo mem alloc!!!
 
 Thread::~Thread() {
-    myHandle->setFinished(true);
-    _syscall_cpp::delete myHandle;
+    thread_exit();
 }
 
 int Thread::start() {
@@ -42,23 +40,20 @@ void Thread::threadWrapper(void *thread) {
 }
 
 Semaphore::Semaphore(unsigned int init) {
-    myHandle = nullptr;
     sem_open(&myHandle,init);
 }
 
 Semaphore::~Semaphore() {
     sem_close(myHandle);
-    ::delete myHandle;
 }
-
 int Semaphore::wait() {
-    sem_wait(myHandle);
-    return 0;
+    return sem_wait(myHandle);
 }
-
 int Semaphore::signal() {
-    sem_signal(myHandle);
-    return 0;
+    return sem_signal(myHandle);
+}
+int Semaphore::tryWait() {
+    return sem_trywait(myHandle);
 }
 
 /*int Semaphore::timedWait(time_t t) {
@@ -66,10 +61,6 @@ int Semaphore::signal() {
     return 0;
 }
 
-int Semaphore::tryWait() {
-    sem_trywait(myHandle);
-    return 0;
-}
 
 void PeriodicThread::terminate() {
     //terminate();

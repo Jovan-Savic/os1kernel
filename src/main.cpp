@@ -2,10 +2,8 @@
 // Created by marko on 20.4.22..
 //
 
-#include "../h/tcb.hpp"
 #include "../h/workers.hpp"
 #include "../h/syscall_c.hpp"
-#include "../h/semaphore.hpp"
 int main()
 {
     MemoryAllocator::init();
@@ -55,7 +53,7 @@ int main()
     thread_create(&threads[3],workerBodyC, semafor);
     printString("ThreadC created\n");
     //threads[4] = TCB::createThread(workerBodyD, nullptr);
-    thread_create(&threads[4],workerBodyD, nullptr);
+    thread_create(&threads[4],workerBodyD, semafor);
     printString("ThreadD created\n");
 
 

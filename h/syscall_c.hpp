@@ -6,7 +6,6 @@
 #define PROJEKAT_SYSCALL_C_HPP
 
 #include "../lib/hw.h"
-#include "tcb.hpp"
 #include "semaphore.hpp"
 
 void* mem_alloc (size_t size);

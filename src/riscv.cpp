@@ -27,7 +27,7 @@ void Riscv::handleSupervisorTrap() {
             case 0x01:
                 size_t size;
                 void *mallocr;
-                __asm__ volatile("mv %0, a1":"=r"(size));
+                __asm__ volatile("ld %0, 88(x8)":"=r"(size));
                 mallocr = MemoryAllocator::mem_alloc(size);
                 __asm__ volatile("mv t0, %0"::"r"(mallocr));
                 __asm__ volatile("sd t0, 80(x8)");
@@ -36,7 +36,7 @@ void Riscv::handleSupervisorTrap() {
             case 0x02:
                 void *freep;
                 int greska;
-                __asm__ volatile("mv %0, a1":"=r"(freep));
+                __asm__ volatile("ld %0, 88(x8)":"=r"(freep));
                 greska = MemoryAllocator::mem_free(freep);
                 __asm__ volatile("mv t0, %0" ::"r"(greska));
                 __asm__ volatile("sd t0, 80(x8)");
@@ -87,15 +87,24 @@ void Riscv::handleSupervisorTrap() {
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
+
             case 0x23:
                 __asm__ volatile("ld %0, 88(x8)": "=r"(id));
                 ret = id->sem::wait();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
+
             case 0x24:
                 __asm__ volatile("ld %0, 88(x8)": "=r"(id));
                 ret = id->sem::signal();
+                __asm__ volatile("mv t0, %0" ::"r"(ret));
+                __asm__ volatile("sw t0, 80(x8)");
+                break;
+
+            case 0x26:
+                __asm__ volatile("ld %0, 88(x8)": "=r"(id));
+                ret = id->sem::trywait();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;

@@ -95,6 +95,8 @@ void workerBodyC(void* g)
 
 void workerBodyD(void* g)
 {
+    sem* s = (sem*) g;
+    sem_trywait(s);
     uint8 i = 10;
     for (; i < 13; i++)
     {
@@ -118,5 +120,6 @@ void workerBodyD(void* g)
         printInteger(i);
         printString("\n");
     }
+    //sem_signal(s);
 //    TCB::yield();
 }
