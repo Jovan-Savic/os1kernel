@@ -7,10 +7,6 @@
 
 #include "../lib/hw.h"
 #include "../lib/console.h"
-#include "print.hpp"
-#include "tcb.hpp"
-#include "MemoryAllocator.hpp"
-#include "semaphore.hpp"
 class Riscv
 {
 public:

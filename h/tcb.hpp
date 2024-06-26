@@ -43,7 +43,9 @@ private:
                 finished(false),
                 blocked(false)
     {
-        if(body!= nullptr) Scheduler::put(this);
+        if(body!= nullptr) {
+            Scheduler::put(this);
+        }
     };
 
     struct Context{

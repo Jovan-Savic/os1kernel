@@ -27,16 +27,17 @@ void TCB::operator delete[](void *p) noexcept
 {
     MemoryAllocator::mem_free(p);
 }
-
+/*
 void TCB::yield(){
     //__asm__ volatile("li a0, 0x13");
     //__asm__ volatile("ecall");
     TCB::timeSliceCounter=0;
     TCB::dispatch();
 }
-
+*/
 void TCB::dispatch(){
 
+    if(TCB::running->body != nullptr || Riscv::r_scause()) Riscv::mc_sstatus(Riscv::SSTATUS_SPP);
     TCB* old= running;
     if(!old->isFinished() && !old->blocked){
         Scheduler::put(old);
@@ -56,7 +57,7 @@ void TCB::deleteThread(TCB* thread){
 
 int TCB::exitThread(){
     TCB::running->setFinished(true);
-    TCB::yield();
+    TCB::dispatch();
     return 0;
 }
 
@@ -66,7 +67,7 @@ void TCB::threadWrapper() {
     Riscv::popSppSpie();
     running->body(running->argument);
     running->setFinished(true);
-    TCB::yield();
+    TCB::dispatch();
 }
 
 void TCB::setBlocked(bool b) {

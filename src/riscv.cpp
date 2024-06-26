@@ -4,7 +4,9 @@
 
 #include "../h/riscv.hpp"
 #include "../h/syscall_c.hpp"
-
+#include "../h/tcb.hpp"
+#include "../h/semaphore.hpp"
+#include "../h/print.hpp"
 
 void Riscv::popSppSpie() {
     __asm__ volatile("csrw sepc, ra");
@@ -119,28 +121,35 @@ void Riscv::handleSupervisorTrap() {
         w_sepc(sepc);
     }
     else if(scause == 0x8000000000000001UL){
+
         mc_sip(SIP_SSIP);
+        uint64 volatile sepc = r_sepc();
+        uint64 volatile sstatus = r_sstatus();
+
         TCB::timeSliceCounter++;
         //supervisor software interrupt; timer
         if(TCB::timeSliceCounter >= TCB::running->getTimeSlice()) {
-
-            uint64 volatile sepc = r_sepc();
-            uint64 volatile sstatus = r_sstatus();
             TCB::timeSliceCounter=0;
             TCB::dispatch();
-            w_sstatus(sstatus);
-            w_sepc(sepc);
         }
+
+        w_sstatus(sstatus);
+        w_sepc(sepc);
 
 
     }else if(scause == 0x8000000000000009UL){
         // supervisor external interrupt; console
 
         console_handler();
-    }else{
+    }else if(scause == 0x0000000000000002UL){
         //unexpected interrupt;
         //printInteger(scause);
         //printInteger(r_sepc());
         //printInteger(r_stval());
+        printString("greska\n");
+
+        __asm__ volatile("li t0, 0x5555");
+        __asm__ volatile("li t1, 0x100000");
+        __asm__ volatile("sw t0, 0(t1)");
     }
 };
