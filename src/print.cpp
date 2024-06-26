@@ -1,7 +1,7 @@
 //
 // Created by os on 5/17/24.
 //
-
+/*
 #include "../h/print.hpp"
 
 
@@ -39,3 +39,4 @@ void printInteger(uint64 integer){
     Riscv::ms_sstatus(sstatus & Riscv::SSTATUS_SIE ? Riscv::SSTATUS_SIE : 0);
 
 }
+ */

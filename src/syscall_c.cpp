@@ -73,7 +73,6 @@ int sem_close(sem_t handle) {
     __asm__ volatile("mv a1, %0" :: "r"(handle));
     __asm__ volatile("li a0, 0x22");
     __asm__ volatile("ecall");
-
     int r;
     __asm__ volatile("mv %0, a0": "=r"(r));
     return r;
@@ -108,4 +107,20 @@ int sem_trywait(sem_t id) {
     int r;
     __asm__ volatile("mv %0, a0": "=r"(r));
     return r;
+}
+
+char getc() {
+    return __getc();
+}
+
+void putc(char a) {
+    __putc(a);
+}
+
+int sem_timedwait(sem_t id, time_t timeout) {
+    return 0;
+}
+
+int time_sleep(time_t) {
+    return 0;
 }

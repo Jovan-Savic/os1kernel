@@ -12,16 +12,6 @@ class List
         {
         private:
 
-    void *operator new(size_t n)
-    {
-        return MemoryAllocator::mem_alloc(n);
-    }
-
-    void *operator new[](size_t n)
-    {
-        return MemoryAllocator::mem_alloc(n);
-    }
-
     void operator delete(void *p) noexcept
     {
         MemoryAllocator::mem_free(p);
@@ -48,14 +38,14 @@ class List
             List<T> &operator=(const List<T> &) = delete;
 
             void addFirst(T*data){
-                Elem* elem = (Elem*)operator new(sizeof(Elem));
+                Elem* elem = (Elem*)MemoryAllocator::mem_alloc(sizeof(Elem));
                 elem->data=data;
                 elem->next=0;
                 head= elem;
                 if(!tail) tail = head;
             }
             void addLast (T* data){
-                Elem* elem = (Elem*)operator new(sizeof(Elem));
+                Elem* elem = (Elem*)MemoryAllocator::mem_alloc(sizeof(Elem));
                 elem->data=data;
                 elem->next=0;
                 if(tail){

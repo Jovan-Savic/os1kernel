@@ -29,8 +29,10 @@ void TCB::operator delete[](void *p) noexcept
 }
 
 void TCB::yield(){
-    __asm__ volatile("li a0, 0x13");
-    __asm__ volatile("ecall");
+    //__asm__ volatile("li a0, 0x13");
+    //__asm__ volatile("ecall");
+    TCB::timeSliceCounter=0;
+    TCB::dispatch();
 }
 
 void TCB::dispatch(){
@@ -54,7 +56,7 @@ void TCB::deleteThread(TCB* thread){
 
 int TCB::exitThread(){
     TCB::running->setFinished(true);
-    TCB::dispatch();
+    TCB::yield();
     return 0;
 }
 

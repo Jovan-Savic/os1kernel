@@ -4,31 +4,31 @@
 
 #include "../h/semaphore.hpp"
 
-void *sem::operator new(size_t n)
+void *semaphore::operator new(size_t n)
 {
     return MemoryAllocator::mem_alloc(n);
 }
 
-void *sem::operator new[](size_t n)
+void *semaphore::operator new[](size_t n)
 {
     return MemoryAllocator::mem_alloc(n);
 }
 
-void sem::operator delete(void *p) noexcept
+void semaphore::operator delete(void *p) noexcept
 {
     MemoryAllocator::mem_free(p);
 }
 
-void sem::operator delete[](void *p) noexcept
+void semaphore::operator delete[](void *p) noexcept
 {
     MemoryAllocator::mem_free(p);
 }
 
-sem *sem::openSemaphore(int val) {
-    return new sem(val);
+semaphore *semaphore::openSemaphore(int val) {
+    return new semaphore(val);
 }
 
-int sem::closeSemaphore() {
+int semaphore::closeSemaphore() {
     if(!this->closed) this->closed = true;
     else return -2;
 
@@ -40,7 +40,7 @@ int sem::closeSemaphore() {
     return 0;
 }
 
-int sem::wait() {
+int semaphore::wait() {
     if(this->closed) return -2;
     this->value--;
     if(this->value <0){
@@ -50,7 +50,7 @@ int sem::wait() {
     return 0;
 }
 
-int sem::signal() {
+int semaphore::signal() {
     if(this->closed) return -2;
     this->value++;
     if(this->value <=0){
@@ -59,7 +59,7 @@ int sem::signal() {
     return 0;
 }
 
-int sem::trywait() {
+int semaphore::trywait() {
 
     if(this->closed) return -2;
     if(this->value -1 <0){
@@ -69,11 +69,11 @@ int sem::trywait() {
 
 }
 
-int sem::timed_wait() {
+int semaphore::timed_wait() {
     return 0;
 }
 
-void sem::block() {
+void semaphore::block() {
     this->blocked.addLast(TCB::running);
     TCB::running->setBlocked(true);
 
@@ -81,7 +81,7 @@ void sem::block() {
     TCB::dispatch();
 }
 
-void sem::unblock() {
+void semaphore::unblock() {
 
     TCB *thread = this->blocked.removeFirst();
     if (thread) {

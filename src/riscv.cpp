@@ -21,8 +21,8 @@ void Riscv::handleSupervisorTrap() {
         uint64 volatile sepc = r_sepc() +4;
         uint64 volatile sstatus = r_sstatus();
         int ret;
-        sem_t * shandle;
-        sem_t id;
+        semaphore ** shandle;
+        semaphore * id;
         switch (ra) {
             case 0x01:
                 size_t size;
@@ -74,7 +74,7 @@ void Riscv::handleSupervisorTrap() {
                 int val;
                 __asm__ volatile("ld %0, 88(x8)": "=r"(shandle));
                 __asm__ volatile("ld %0, 96(x8)": "=r"(val));
-                *shandle = sem::openSemaphore(val);
+                *shandle = semaphore::openSemaphore(val);
                 if(*shandle != nullptr) ret =0;
                 else ret = -1;
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
@@ -83,28 +83,30 @@ void Riscv::handleSupervisorTrap() {
 
             case 0x22:
                 __asm__ volatile("ld %0, 88(x8)": "=r"(id));
-                ret = id->sem::closeSemaphore();
+                ret = id->semaphore::closeSemaphore();
+                //MemoryAllocator::mem_free(id);
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
 
             case 0x23:
                 __asm__ volatile("ld %0, 88(x8)": "=r"(id));
-                ret = id->sem::wait();
+                if(id != nullptr) ret = id->semaphore::wait();
+                else ret = -1;
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
 
             case 0x24:
                 __asm__ volatile("ld %0, 88(x8)": "=r"(id));
-                ret = id->sem::signal();
+                ret = id->semaphore::signal();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
 
             case 0x26:
                 __asm__ volatile("ld %0, 88(x8)": "=r"(id));
-                ret = id->sem::trywait();
+                ret = id->semaphore::trywait();
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
@@ -137,8 +139,8 @@ void Riscv::handleSupervisorTrap() {
         console_handler();
     }else{
         //unexpected interrupt;
-        printInteger(scause);
-        printInteger(r_sepc());
-        printInteger(r_stval());
+        //printInteger(scause);
+        //printInteger(r_sepc());
+        //printInteger(r_stval());
     }
 };

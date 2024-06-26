@@ -6,8 +6,7 @@
 #define PROJEKAT_SYSCALL_C_HPP
 
 #include "../lib/hw.h"
-#include "semaphore.hpp"
-
+#include "../lib/console.h"
 void* mem_alloc (size_t size);
     int mem_free (void* p);
 

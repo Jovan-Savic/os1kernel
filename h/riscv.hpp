@@ -10,6 +10,7 @@
 #include "print.hpp"
 #include "tcb.hpp"
 #include "MemoryAllocator.hpp"
+#include "semaphore.hpp"
 class Riscv
 {
 public:

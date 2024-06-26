@@ -9,7 +9,7 @@
 #include "../lib/hw.h"
 #include "tcb.hpp"
 
-class sem {
+class semaphore {
 
     void *operator new(size_t n);
 
@@ -19,7 +19,7 @@ class sem {
 
     void operator delete[](void *p) noexcept;
 public:
-    static sem* openSemaphore(int val);
+    static semaphore* openSemaphore(int val);
     int closeSemaphore();
     int wait();
     int signal();
@@ -28,7 +28,7 @@ public:
 
 
 private:
-    explicit sem(int val = 1): value(val), closed(false){};
+    explicit semaphore(int val = 1): value(val), closed(false){};
     int value;
     bool closed;
     List<TCB> blocked;

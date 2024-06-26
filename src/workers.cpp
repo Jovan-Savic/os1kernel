@@ -1,7 +1,7 @@
 //
 // Created by marko on 20.4.22..
 //
-
+/*
 #include "../lib/hw.h"
 #include "../h/print.hpp"
 #include "../h/syscall_c.hpp"
@@ -9,7 +9,7 @@
 
 void workerBodyA(void* g)
 {
-    sem* s = (sem*) g;
+    sem_t s = (semaphore*) g;
     sem_wait(s);
     for (uint64 i = 0; i < 10; i++)
     {
@@ -57,7 +57,7 @@ static uint64 fibonacci(uint64 n)
 
 void workerBodyC(void* g)
 {
-   sem* s = (sem*) g;
+   sem_t s = (semaphore*) g;
     sem_wait(s);
     uint8 i = 0;
     for (; i < 3; i++)
@@ -95,7 +95,7 @@ void workerBodyC(void* g)
 
 void workerBodyD(void* g)
 {
-    sem* s = (sem*) g;
+    sem_t s = (semaphore*) g;
     sem_trywait(s);
     uint8 i = 10;
     for (; i < 13; i++)
@@ -123,3 +123,4 @@ void workerBodyD(void* g)
     //sem_signal(s);
 //    TCB::yield();
 }
+ */
