@@ -6,8 +6,8 @@
 #define PROJEKAT_SYSCALL_C_HPP
 
 #include "../lib/hw.h"
-#include "tcb.hpp"
-#include "semaphore.hpp"
+#include "../lib/console.h"
+
 
 void* mem_alloc (size_t size);
     int mem_free (void* p);
@@ -34,14 +34,14 @@ void* mem_alloc (size_t size);
     int sem_close (sem_t handle);
     int sem_wait (sem_t id);
     int sem_signal (sem_t id);
-    int sem_timedwait(
-            sem_t id,
-            time_t timeout
-    );
     int sem_trywait(sem_t id);
 
+    //neimplementirane funkcije
     int time_sleep (time_t);
-
+    int sem_timedwait(
+        sem_t id,
+        time_t timeout
+    );
     const int EOF = -1;
     char getc ();
     void putc (char);

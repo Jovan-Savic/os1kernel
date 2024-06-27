@@ -17,9 +17,7 @@ private:
     static FreeMem* freememhead;
 
     static int join(FreeMem* tek);
-    static bool isinitialized;
 public:
-    static int getFreeMemSize(){ return sizeof(FreeMem);}
     static void* mem_alloc(size_t size);
     static int mem_free(const void* adr);
     static void init();

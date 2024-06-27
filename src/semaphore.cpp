@@ -4,72 +4,84 @@
 
 #include "../h/semaphore.hpp"
 
-void *sem::operator new(size_t n)
+void *semaphore::operator new(size_t n)
 {
     return MemoryAllocator::mem_alloc(n);
 }
-
-void *sem::operator new[](size_t n)
+void *semaphore::operator new[](size_t n)
 {
     return MemoryAllocator::mem_alloc(n);
 }
-
-void sem::operator delete(void *p) noexcept
+void semaphore::operator delete(void *p) noexcept
+{
+    MemoryAllocator::mem_free(p);
+}
+void semaphore::operator delete[](void *p) noexcept
 {
     MemoryAllocator::mem_free(p);
 }
 
-void sem::operator delete[](void *p) noexcept
-{
-    MemoryAllocator::mem_free(p);
+semaphore *semaphore::openSemaphore(int val) {
+    return new semaphore(val);
 }
 
-sem *sem::openSemaphore(int val) {
-    return new sem(val);
-}
-
-int sem::closeSemaphore() {
+int semaphore::closeSemaphore() {
     if(!this->closed) this->closed = true;
     else return -2;
 
    while(this->blocked.peekFirst()){
-       TCB* thread = this->blocked.removeFirst();
-       thread->setBlocked(false);
-       Scheduler::put(thread);
+       unblock();
    }
     return 0;
 }
 
-int sem::wait() {
+int semaphore::wait() {
     if(this->closed) return -2;
     this->value--;
     if(this->value <0){
-        this->blocked.addLast(TCB::running);
-        TCB::running->setBlocked(true);
-
-        TCB::timeSliceCounter=0;
-        TCB::dispatch();
+        block();
     }
 
     return 0;
 }
 
-int sem::signal() {
+int semaphore::signal() {
     if(this->closed) return -2;
     this->value++;
-    if(this->value >0){
-        TCB* thread = this->blocked.removeFirst();
+    if(this->value <=0){
+       unblock();
+    }
+    return 0;
+}
+
+int semaphore::trywait() {
+
+    if(this->closed) return -2;
+    if(this->value -1 <0){
+        return 0;
+    }
+    return 1;
+
+}
+
+int semaphore::timed_wait() {
+    return 0;
+}
+
+void semaphore::block() {
+    this->blocked.addLast(TCB::running);
+    TCB::running->setBlocked(true);
+
+    TCB::timeSliceCounter=0;
+    TCB::dispatch();
+}
+
+void semaphore::unblock() {
+
+    TCB *thread = this->blocked.removeFirst();
+    if (thread) {
         thread->setBlocked(false);
         Scheduler::put(thread);
     }
-    return 0;
-}
-
-int sem::trywait() {
-    return 0;
-}
-
-int sem::timed_wait() {
-    return 0;
 }
 

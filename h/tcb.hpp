@@ -11,17 +11,16 @@
 class TCB {
 
     void *operator new(size_t n);
-
     void *operator new[](size_t n);
-
     void operator delete(void *p) noexcept;
-
     void operator delete[](void *p) noexcept;
 
 public:
-    ~TCB(){TCB::operator delete[](stack);}
+
+    ~TCB(){ delete stack;}
     bool isFinished() const {return finished;}
-    void setFinished(bool f) { TCB::finished = f;}
+    void setFinished(bool f) { finished = f;}
+    void setBlocked(bool b) {blocked = b;};
 
     uint64 getTimeSlice() const { return timeSlice; }
 
@@ -29,13 +28,10 @@ public:
     using Body = void(*)(void*);
 
     static TCB *createThread(Body body, void *arg, void*stek);
-    static void deleteThread(TCB *thread);
     static int exitThread();
     static void yield();
-    void setBlocked(bool b);
-
 private:
-    explicit TCB(Body body, uint64 timeSlice, void* arg, void* stek): body(body), argument(arg), stack((uint64*)stek),
+    explicit TCB(Body body, uint64 timeSlice, void* arg, void* stek): body(body), argument(arg), stack((uint8*)stek + 8 * DEFAULT_STACK_SIZE),
     context({
             (uint64) &threadWrapper,
             stack != nullptr ? (uint64) &stack[DEFAULT_STACK_SIZE] : 0
@@ -44,7 +40,9 @@ private:
                 finished(false),
                 blocked(false)
     {
-        if(body!= nullptr) Scheduler::put(this);
+        if(body!= nullptr) {
+            Scheduler::put(this);
+        }
     };
 
     struct Context{
@@ -53,21 +51,19 @@ private:
     };
     Body body;
     void* argument;
-    uint64 *stack;
+    uint8 *stack;
     Context context;
     uint64 timeSlice;
     bool finished;
     bool blocked;
-
     static uint64 timeSliceCounter;
+
     friend class Riscv;
-    friend class sem;
+    friend class semaphore;
+
     static void threadWrapper();
     static void dispatch();
     static void contextSwitch(Context* old, Context* running);
-
-
-
 };
 
 

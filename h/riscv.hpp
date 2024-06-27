@@ -1,5 +1,5 @@
 //
-// Created by marko on 20.4.22..
+// Created by os on 5/17/24.
 //
 
 #ifndef OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_RISCV_HPP
@@ -7,9 +7,6 @@
 
 #include "../lib/hw.h"
 #include "../lib/console.h"
-#include "print.hpp"
-#include "tcb.hpp"
-#include "MemoryAllocator.hpp"
 class Riscv
 {
 public:

@@ -6,36 +6,6 @@
 
 MemoryAllocator::FreeMem *MemoryAllocator::freememhead = nullptr;
 void* MemoryAllocator::mem_alloc( size_t size) {
-   /*FreeMem *tek = freememhead;
-   FreeMem *predhodni = nullptr;
-   FreeMem *sledeci;
-   size_t sizei = 0;
-
-    if(size%MEM_BLOCK_SIZE != 0) sizei = ((size + MEM_BLOCK_SIZE - 1) / MEM_BLOCK_SIZE) * MEM_BLOCK_SIZE;
-    else sizei = size;
-
-    if(tek && sizei > tek->size){
-       predhodni = tek;
-       for(tek = tek->next; tek && sizei > tek->size;predhodni = tek, tek = tek->next) {};
-   }
-
-   if(!tek) return nullptr;
-
-   if (tek->size > sizei){
-       size_t pom = tek->size - sizei - HEADER_SIZE;
-       tek->size = sizei;
-       sledeci = (FreeMem *)(sizei + HEADER_SIZE+ (size_t)tek);
-       * sledeci={tek->next,pom};
-
-   }else sledeci = tek->next;
-
-   tek->next = (FreeMem *)((size_t)tek ^ tek->size);
-   if(predhodni) predhodni->next = sledeci;
-   else freememhead = sledeci;
-   return (void *)(tek+1);
-
-
-*/
     FreeMem* tek = freememhead;
     FreeMem* predhodni = nullptr;
     FreeMem* sledeci = nullptr;
@@ -89,7 +59,6 @@ int MemoryAllocator::mem_free(const void * addr) {
         join(freememhead);
     }
     else {
-        //Find place in list
         FreeMem* currFree = freememhead;
         for(currFree = freememhead; currFree->sled && (size_t)(currFree->sled) < (size_t) tek; currFree = currFree->sled);
 

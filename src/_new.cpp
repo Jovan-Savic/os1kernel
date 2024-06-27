@@ -1,9 +1,8 @@
 //
-// Created by marko on 20.4.22..
-//
+// Created by os on 5.16.22..
+// Implementacija operatora new i delete za korisnicke niti
 
 #include "../h/syscall_c.hpp"
-#include "../h/print.hpp"
 using size_t = decltype(sizeof(0));
 
 void *operator new(size_t n)
