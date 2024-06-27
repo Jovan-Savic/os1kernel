@@ -9,13 +9,17 @@
 #include "../h/print.hpp"
 
 void Riscv::popSppSpie() {
+
+    if(TCB::running->body != nullptr) {
+        __asm__ volatile ("csrc sstatus, %[mask]" : : [mask] "r"(Riscv::BitMaskSstatus::SSTATUS_SPP));
+    }
     __asm__ volatile("csrw sepc, ra");
     __asm__ volatile("sret");
 }
 
 void Riscv::handleSupervisorTrap() {
 
-    uint64 ra = r_a0();
+    uint64 kod = r_a0();
     uint64 scause = r_scause();
 
     if(scause == 0x0000000000000008UL || scause == 0x0000000000000009UL){//pomera registar a3??
@@ -23,9 +27,10 @@ void Riscv::handleSupervisorTrap() {
         uint64 volatile sepc = r_sepc() +4;
         uint64 volatile sstatus = r_sstatus();
         int ret;
+        char c;
         semaphore ** shandle;
         semaphore * id;
-        switch (ra) {
+        switch (kod) {
             case 0x01:
                 size_t size;
                 void *mallocr;
@@ -112,6 +117,15 @@ void Riscv::handleSupervisorTrap() {
                 __asm__ volatile("mv t0, %0" ::"r"(ret));
                 __asm__ volatile("sw t0, 80(x8)");
                 break;
+            case 0x41:
+                c = __getc();
+                __asm__ volatile ("mv t0, %0" : : "r"(c));
+                __asm__ volatile ("sw t0, 80(x8)");
+                break;
+            case 0x42:
+                __asm__ volatile("ld %0, 88(x8)": "=r"(c));
+                __putc(c);
+                break;
             default:
                     break;
 
@@ -139,8 +153,14 @@ void Riscv::handleSupervisorTrap() {
 
     }else if(scause == 0x8000000000000009UL){
         // supervisor external interrupt; console
+        uint64 volatile sepc = r_sepc();
+        uint64 volatile sstatus = r_sstatus();
 
         console_handler();
+
+        w_sstatus(sstatus);
+        w_sepc(sepc);
+
     }else if(scause == 0x0000000000000002UL){
         //unexpected interrupt;
         //printInteger(scause);

@@ -37,7 +37,6 @@ void TCB::yield(){
 */
 void TCB::dispatch(){
 
-    if(TCB::running->body != nullptr || Riscv::r_scause()) Riscv::mc_sstatus(Riscv::SSTATUS_SPP);
     TCB* old= running;
     if(!old->isFinished() && !old->blocked){
         Scheduler::put(old);

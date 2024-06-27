@@ -110,11 +110,18 @@ int sem_trywait(sem_t id) {
 }
 
 char getc() {
-    return __getc();
+    __asm__ volatile("li a0, 0x41");
+    __asm__ volatile("ecall");
+
+    char r;
+    __asm__ volatile("mv %0, a0": "=r"(r));
+    return r;
 }
 
 void putc(char a) {
-    __putc(a);
+    __asm__ volatile("mv a1, %0" :: "r"(a));
+    __asm__ volatile("li a0, 0x42");
+    __asm__ volatile("ecall");
 }
 
 int sem_timedwait(sem_t id, time_t timeout) {

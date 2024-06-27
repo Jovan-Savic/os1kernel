@@ -5,7 +5,6 @@
 extern void userMain();
 
 void functionHelper(void* thr){ //omotac korisnicke funkcije
-    //Riscv::mc_sstatus(Riscv::SSTATUS_SPP);
     userMain();
 }
 
@@ -20,8 +19,6 @@ int main(){
 
     thread_create(&threads[1],functionHelper, nullptr);
     while(!(threads[1]->isFinished())){
-
-
         thread_dispatch();
     }
 
