@@ -4,7 +4,7 @@
 
 This project represents simple, yet fully functional kernel for RISC-V architecture. It is completely made from scratch, meaning it fully lies on the most basic concepts of C/C++ programming languages. Additionaly, no external (nor internal) library is used in creation process.
 
-The whole project was sophomore year's biggest obstacle, which was covered on ***Operating Systems 1*** course at the School of Electrical Engineering @ University of Belgrade :serbia:
+The whole project was sophomore year's biggest obstacle, which was covered on ***Operating Systems 1*** course at the School of Electrical Engineering at University of Belgrade
 
 ## Kernel overview
 
@@ -18,7 +18,7 @@ The whole project was sophomore year's biggest obstacle, which was covered on **
 
 ## Important notes
 
-**userMain** is used as ordinary main in other projects, where **main** in this case is used only in system mode (regime), it prepares whole kernel for user activities - initialization of memory and preparing for userMain and user mode.
+**userMain** is used as ordinary main in other projects, where **main** in this case is used only in system mode, it prepares whole kernel for user activities - initialization of memory and preparing for userMain and user mode.
 
 Kernel and user app are compiled as one .exe file which is then run on the host OS - modified version of MIT's xv6 OS. Using QEMU emulator, xv6 creates virtual space for our .exe file, making it see the whole system as it's own HW with one whole available memory space.
 
