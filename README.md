@@ -1,4 +1,4 @@
-# riscv-kernel // Multithreaded, time-sharing kernel for RISC-V ISA
+# Multithreaded, time-sharing kernel for RISC-V ISA
 
 ## About the project
 
