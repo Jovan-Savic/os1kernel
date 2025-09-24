@@ -4,8 +4,6 @@
 
 This project represents a simple yet fully functional kernel for the RISC-V architecture. It is completely made from scratch, meaning it is based on the most fundamental concepts of C/C++ programming languages. Additionally, no external (nor internal) library is used in the creation process.
 
-The entire project was the biggest obstacle of the sophomore year, which was covered in the ***Operating Systems 1*** course at the School of Electrical Engineering at the University of Belgrade.
-
 ## Kernel overview
 
 - Memory allocator
@@ -43,14 +41,14 @@ ABI is made of the following classes:
 
 ### Memory Allocation
 
-The smallest blocklike unit in memory is an object of a structure called MemoryBlock, which stores info about how much of size (size_t, in bytes) does the block use (without structure header), and a pointer to the next available MemoryBlock.
+The smallest blocklike unit in memory is an object of a structure called FreeMem, which stores info about how much of size (size_t, in bytes) does the block use (without structure header), and a pointer to the next available FreeMem.
 
 Initially, MemoryAllocator allocates the whole memory as one available block.
 
 MemoryAllocator uses 2 fundamental methods in all the upper layers as well as in the user apps:
 
 - `void* mem_alloc(size_t sz)` -> returns a pointer to the newly allocated block in memory, or returns nullptr if some error occurred
-  - It uses the `FirstFit` algorithm for block choosing. More on this algorithm can be read [here](https://www.geeksforgeeks.org/program-first-fit-algorithm-memory-management/)
+  - It uses the `FirstFit` algorithm for block choosing.
 - `int mem_free(void* ptr)` -> returns 0 if everything is good, otherwise it returns the corresponding error code
   - It is a must to pass a pointer of a previously allocated block from `mem_alloc` to this function for this function to work properly!
   - `mem_free` appends the block pointed by the passed argument to the `tail` - the last available block tracked in MemoryAllocator.
@@ -62,7 +60,7 @@ Table of used constants in Memory management defined in hw.lib (all are extern)
 | const void* | HEAP_END_ADDR | End address of the virtual memory used by processes and the kernel itself |
 | const size_t | MEM_BLOCK_SIZE | The unit used for memory allocation |
 
-Initial memory size is then (size_t)HEAP_END_ADDR - (size_t)HEAP_START_ADDR - sizeof(MemoryBlock), or one whole block.
+Initial memory size is then (size_t)HEAP_END_ADDR - (size_t)HEAP_START_ADDR - sizeof(FreeMem), or one whole block.
 
 ### Interrupt handling
 
@@ -76,8 +74,6 @@ Every computer system has SW and HW interrupts, as a way to do different tasks. 
 - Write permission denied
 - Software interrupt
   - This one is used most of the time since it calls void Machine::callerFunction(...), the true wrapper that calls a particular system call according to the function code passed as the first argument
-
-More on Computer interrupts can be read [here](https://en.wikipedia.org/wiki/Interrupt)
 
 ## C Application Programming Interface - C API
 
@@ -106,16 +102,19 @@ C++ API is a layer above the C API. It provides an object-oriented programming i
 
 Threads:
 ```C++
-class Thread{
 public:
-    Thread(void (*body)(void*),void* arg);
-    virtual ~Thread(){}
-
-    int start();
-    static void dispatch();
+    Thread (void (*body)(void*), void* arg);//
+    virtual ~Thread ();//
+    int start ();//
+    static void dispatch ();//
+    static int sleep (time_t);
 protected:
-    Thread();
-    virtual void run(){}
+    Thread ();//
+    virtual void run () {}//
+private:
+    thread_t myHandle;
+    void (*body)(void*); void* arg;
+    static void threadWrapper(void *thread);//
 };
 ```
 The Thread class supports 2 ways of creating Threads: 
@@ -124,12 +123,16 @@ The Thread class supports 2 ways of creating Threads:
 
 Semaphores:
 ```C++
-class Semaphore{
-public:
-    Semaphore(uint init = 1);
-    virtual ~Semaphore(){}
-    int wait();
-    int signal();
+class Semaphore {
+        public:
+    Semaphore (unsigned init = 1);
+        virtual ~Semaphore ();//
+        int wait ();//
+        int signal ();//
+        int timedWait (time_t);
+        int tryWait();//
+        private:
+        sem_t myHandle;
 };
 ```
 
@@ -147,8 +150,10 @@ It is made of a dynamic list seen as a Queue for ready threads. It uses 2 simple
 TCB provides different static and non-static methods necessary for thread creation, deletion, and watching:
 
 - TCB(Body body, uint64 timeSlice, void * args) -> makes an active thread with the corresponding function body and its arguments, as well as timeSlice[^3], and puts it in the Scheduler
-- createThreadNonScheduler(Body body, void *args) -> does the same job as the previous constructor without putting the thread in the Scheduler. This is used for semaphores
+- deleteThread(TCB *thread);
+- setBlocked(bool b);
 - yield() -> change of processor context on request. Scheduler puts the current thread in, and chooses a new one according to the FIFO algorithm
+- exitThread();
 - isFinished()
 - setFinished(bool value)
 - getTimeSlice()
@@ -175,15 +180,13 @@ When all unprivileged threads from userMain are finished, userMain finishes and 
 
 ## Want to see more?
 
-The whole text project is available in the Serbian language on the courses [website](http://os.etf.rs/OS1/index.htm) in the section Project.
+The whole text project is available in the Serbian language on the courses [website](http://os.etf.rs/OS1/index.html) in the section Project.
 
 It is recommended to understand basic terms and concepts used in this project, such as:
 - Memory management and organisation
 - Basics of assembly for RISC-V (available in the  documentation previously mentioned)
 - Processes and threads
 - Process sync using Semaphores
-
-If you are not familiar with any of these terms, feel free to search for them on sites such as [geeksforgeeks](https://www.geeksforgeeks.org/) or YouTube. There are also free courses on the web, so search for them too.
 
 # Prepare project for use
 
